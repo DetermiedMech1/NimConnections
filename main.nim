@@ -1,0 +1,3 @@
+import ./connections
+
+connections.updateConnections()
