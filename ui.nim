@@ -1,29 +1,65 @@
-import illwillWidgets
-import illwill
-import strformat, strutils
+import terminal
+import strutils, sequtils, tables
+import os
 
-proc exitProc() {.noconv.} =
-  illwillDeinit()
-  showCursor()
-  quit(0)
+var
+  termh = terminalHeight()
+  termw = terminalWidth()
 
-illwillInit(fullscreen=true, mouse=true)
-setControlCHook(exitProc)
-hideCursor()
+proc resetTerminal() = 
+  terminal.eraseScreen()
+  #terminal.setCursorPos(termw, termh)
+  terminal.setCursorPos(0, 0)
 
-var 
-  tb = newTerminalBuffer(terminalWidth(), terminalHeight())
-  btns: seq[(int, int, Button)]
+type
+  Box = object
+    content: string
+    x, y, w, h: int
+  Drawable = object
+    x, y: int
+    layers: seq[string]
+  
+
+let
+  topLeft = "┌"
+  topRight = "┐"
+  bottomLeft = "└"
+  bottomRight = "┘"
+  horizontal = "─"
+  vertical = "│"
+
+var
+  objects:seq[Drawable]
+
+method render*(b: Box): Drawable =
+  let
+    layers = @[topLeft    & horizontal.repeat(b.w) & topRight] &
+                          @[(vertical  & " ".repeat(b.w)        & vertical    & "\n")].repeat(b.h div 2).foldl(a & b) &
+                          @[vertical   & b.content.center(b.w)  & vertical    & "\n"] &
+                          @[(vertical  & " ".repeat(b.w)        & vertical    & "\n")].repeat(b.h div 2).foldl(a & b) &
+                          @[bottomLeft & horizontal.repeat(b.w) & bottomRight & "\n",]
+
+  return Drawable(x: b.x, y: b.y, layers: layers)
+
 
 for i in 0..<16:
-  let x = (i mod 4) * 15
-  let y = (i div 4) * 4
-  btns.add(
-    (x, y, newButton("Button", x+1, y+1, 14, 3, true, fgRed))
-  )
+  objects.add Box(content: "box", x: (i mod 4)*13, y: (i div 4)*5, w: 10, h: 2).render()
 
-for btn in btns:
-  tb.render(btn[2])
+proc getInput() =
+  
 
-while true:
-  tb.display()
+
+proc drawLoop*(objects:seq[Drawable], redrawDelay:int = 10) =
+  hideCursor()
+  while true:
+    resetTerminal()
+    for obj in objects:
+      var current_layer = 0
+
+      for layer in obj.layers:
+        current_layer.inc
+
+        terminal.setCursorPos(obj.x, obj.y+current_layer)
+        echo layer
+
+    sleep(redrawDelay)
