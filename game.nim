@@ -1,4 +1,3 @@
-import illwill
 import std/[json,
             times,
             sequtils,

@@ -1,23 +1,24 @@
 import terminal
 import strutils, sequtils, tables
+import rdstdin
 import os
 
 var
-  termh = terminalHeight()
-  termw = terminalWidth()
+  termh* = terminalHeight()
+  termw* = terminalWidth()
 
-proc resetTerminal() = 
+proc resetTerminal*() = 
   terminal.eraseScreen()
   #terminal.setCursorPos(termw, termh)
   terminal.setCursorPos(0, 0)
 
 type
-  Box = object
-    content: string
-    x, y, w, h: int
-  Drawable = object
-    x, y: int
-    layers: seq[string]
+  Box* = object
+    content*: string
+    x*, y*, w*, h*: int
+  Drawable* = object
+    x*, y*: int
+    layers*: seq[string]
   
 
 let
@@ -28,9 +29,6 @@ let
   horizontal = "─"
   vertical = "│"
 
-var
-  objects:seq[Drawable]
-
 method render*(b: Box): Drawable =
   let
     layers = @[topLeft    & horizontal.repeat(b.w) & topRight] &
@@ -40,14 +38,6 @@ method render*(b: Box): Drawable =
                           @[bottomLeft & horizontal.repeat(b.w) & bottomRight & "\n",]
 
   return Drawable(x: b.x, y: b.y, layers: layers)
-
-
-for i in 0..<16:
-  objects.add Box(content: "box", x: (i mod 4)*13, y: (i div 4)*5, w: 10, h: 2).render()
-
-proc getInput() =
-  
-
 
 proc drawLoop*(objects:seq[Drawable], redrawDelay:int = 10) =
   hideCursor()
@@ -63,3 +53,6 @@ proc drawLoop*(objects:seq[Drawable], redrawDelay:int = 10) =
         echo layer
 
     sleep(redrawDelay)
+
+when isMainModule:
+  drawLoop(objects,10)
