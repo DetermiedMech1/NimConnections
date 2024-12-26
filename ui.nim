@@ -1,7 +1,9 @@
-import terminal
-import strutils, sequtils, tables
-import rdstdin
-import os
+import std/[terminal, 
+            strutils, 
+            sequtils, 
+            tables, 
+            rdstdin, 
+            os]
 
 var
   termh* = terminalHeight()
@@ -9,7 +11,6 @@ var
 
 proc resetTerminal*() = 
   terminal.eraseScreen()
-  #terminal.setCursorPos(termw, termh)
   terminal.setCursorPos(0, 0)
 
 type
@@ -39,7 +40,7 @@ method render*(b: Box): Drawable =
 
   return Drawable(x: b.x, y: b.y, layers: layers)
 
-proc drawLoop*(objects:seq[Drawable], redrawDelay:int = 10) =
+template drawLoop*(objects:seq[Drawable], redrawDelay:int = 10, body:untyped) =
   hideCursor()
   while true:
     resetTerminal()
@@ -51,8 +52,7 @@ proc drawLoop*(objects:seq[Drawable], redrawDelay:int = 10) =
 
         terminal.setCursorPos(obj.x, obj.y+current_layer)
         echo layer
+    
+    body
 
     sleep(redrawDelay)
-
-when isMainModule:
-  drawLoop(objects,10)

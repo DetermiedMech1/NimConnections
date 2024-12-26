@@ -7,15 +7,14 @@ var
 proc getConnections*():string =
   var
     connections_json:string
-    file = open("connections.json")
+    file = "connections.json"
 
   try:
     connections_json = client.getContent("https://raw.githubusercontent.com/Eyefyre/NYT-Connections-Answers/refs/heads/main/connections.json")
-    file.write(connections_json)
   except:
-    connections_json = file.readAll
     echo "unable to update connections from internet"
+    connections_json = file.readFile
   finally:
-    file.close
+    file.writeFile(connections_json)
 
   return connections_json

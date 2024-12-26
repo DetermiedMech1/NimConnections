@@ -1,7 +1,8 @@
 import std/[json,
             times,
             sequtils,
-            sugar]
+            sugar,
+            strutils]
 
 import connections
 
@@ -32,9 +33,19 @@ proc getGame*(date:string = today): Game =
   else:
     raise newException(ValueError, "No game found for date: " & date)
 
-proc getAnswers*(game:Game = getGame(today)):seq[string] =
+proc getAnswers*(game:Game = getGame(today)):seq[seq[string]] =
   let all_answers = collect:
     for lvl in getGame().answers:
       lvl.members
     
-  return all_answers.foldl(a & b)
+  return all_answers
+
+proc checkOptions*(categories:seq[seq[string]], options:seq[string] = @["","","",""]):(seq[string],bool) =
+  echo categories
+  let
+    correct = options in categories
+    remaining = categories.filterIt(it != options)
+
+  return (remaining.foldl(a & b), correct)
+
+echo checkOptions(getAnswers())
