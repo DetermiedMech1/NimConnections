@@ -1,4 +1,4 @@
-import game, ui
+import game, tui
 import std/[algorithm, 
             sequtils,
             sugar,
@@ -14,7 +14,7 @@ var
 
 shuffle(words)
 
-ui.drawLoop(objects, 10):
+tui.drawLoop(objects, 10):
   var i = -1
   let longest = words.sortedByIt(it.len)[^1]
 
