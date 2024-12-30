@@ -24,5 +24,3 @@ tui.drawLoop(objects, 10):
       Box(content: word,
           x: (i mod 4)*(longest.len+4), y: (i div 4)*5,
           w: longest.len+2, h: 2).render(choices.contains word)
-  
-

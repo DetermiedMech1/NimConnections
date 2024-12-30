@@ -41,11 +41,8 @@ proc getAnswers*(game:Game = getGame(today)):seq[seq[string]] =
   return all_answers
 
 proc checkOptions*(categories:seq[seq[string]], options:seq[string] = @["","","",""]):(seq[string],bool) =
-  echo categories
   let
     correct = options in categories
     remaining = categories.filterIt(it != options)
 
   return (remaining.foldl(a & b), correct)
-
-echo checkOptions(getAnswers())
